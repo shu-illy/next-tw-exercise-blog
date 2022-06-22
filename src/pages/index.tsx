@@ -1,10 +1,11 @@
 import { MicroCMSListResponse } from "microcms-js-sdk";
 import type { GetStaticProps, NextPage } from "next";
+import Link from "next/link";
 import { client } from "src/libs/client";
 
-type Blog = {
+export type Blog = {
   title: string;
-  boty: string;
+  body: string;
 };
 
 type Props = MicroCMSListResponse<Blog>;
@@ -16,7 +17,13 @@ const Home: NextPage<Props> = (props) => {
       <p>{`記事の総数: ${props.totalCount}件`}</p>
       <ul>
         {props.contents.map((content) => {
-          return <li key={content.id}>{content.title}</li>;
+          return (
+            <Link key={content.id} href={`/blog/${content.id}`}>
+              <a>
+                <li>{content.title}</li>
+              </a>
+            </Link>
+          );
         })}
       </ul>
     </div>
@@ -24,7 +31,7 @@ const Home: NextPage<Props> = (props) => {
 };
 
 export const getStaticProps: GetStaticProps<Props> = async () => {
-  const data = await client.getList({ endpoint: "blog" });
+  const data = await client.getList<Blog>({ endpoint: "blog" });
   return {
     props: data,
   };
